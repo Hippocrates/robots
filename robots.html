@@ -3,14 +3,20 @@
 
 <style>
 div.sidebar {
-	position: absolute;
-	left: 524px;
-	top: 10px;
+	float: right;
 }
 div.player_div {
 	min-width: 150px;
 	padding: 20px;
 	border:1px solid black;
+}
+.content {
+	max-width: 725px;
+	margin-left: auto;
+    margin-right: auto;
+}
+#main_canvas {
+    border:1px solid #c3c3c3;
 }
 </style>
 <body>
@@ -28,61 +34,65 @@ div.player_div {
    <img id="grey" src="grey.png">
 </span>
 
-<div id="player_list" class="sidebar"></div>
+<div class="content">
 
-<canvas id="MainCanvas" width="512" height="512" style="border:1px solid #c3c3c3;">
-</canvas>
+	<canvas id="main_canvas" width="512" height="512">
+	</canvas>
+	
+	<div id="player_list" class="sidebar"></div>
 
-<br>
-
-<span id="game_info"></span>
-<br>
-
-<span class="bid solve free">
-	<span id="timer"></span>  <span id="num_moves" class="solve"></span>
 	<br>
-</span>
-
-<span class="playing bid solve">
-	<input id="bid_input" type="text" class="playing bid"></input>
-	<button id="bid" class="playing bid">Bid</button>
-	<span id="curr_bid"></span>
-	<button id="gentleman" class="playing bid">Skip Round</button>
+	
+	<span id="game_info"></span>
 	<br>
-</span>
 
-<span class="playing solving">
-	<span id="turn_indicator">Your Turn!<br></span>
-	<button id="revert">Revert</button>
-	<button id="undo">Undo</button>
-	<button id="redo">Redo</button>
-	<button id="skip">Give Up</button>
-	<br>
-</span>
+	<span class="bid solve free">
+		<span id="timer"></span>  <span id="num_moves" class="solve"></span>
+		<br>
+	</span>
 
-<span class="playing free end">
-	<button id="demo">View Optimal</button>
-	<button id="reset_robots">Reset Robots</button>
-	<button id="next" class="playing free">Next Round</button>
-	<button id="wait" class="playing free">Wait Please</button>
-	<br>
-	<span id="solution_indicator"></span>
-	<br>
-</span>
+	<span class="playing bid solve">
+		<input id="bid_input" type="text" class="playing bid"></input>
+		<button id="bid" class="playing bid">Bid</button>
+		<span id="curr_bid"></span>
+		<button id="gentleman" class="playing bid">Skip Round</button>
+		<br>
+	</span>
 
-<span class="playing">
-	Name: <span id="name"></span>
-	<br>
-	Score: <span id="score"></span>
-	<br>
-</span>
+	<span class="playing solving">
+		<span id="turn_indicator">Your Turn!<br></span>
+		<button id="revert">Revert</button>
+		<button id="undo">Undo</button>
+		<button id="redo">Redo</button>
+		<button id="skip">Give Up</button>
+		<br>
+	</span>
 
-<input id="name_input" type="text" class="" ></input>
-<button id="join_game" class="observing">Join</button>
-<button id="rename_button" class="playing">Rename</button>
-<br>
+	<span class="playing free end">
+		<button id="demo">View Optimal</button>
+		<button id="reset_robots">Reset Robots</button>
+		<button id="next" class="playing free">Next Round</button>
+		<button id="wait" class="playing free">Wait Please</button>
+		<br>
+		<span id="solution_indicator"></span>
+		<br>
+	</span>
 
-<button id="leave_game" class="playing">Leave</button>
+	<span class="playing">
+		Name: <span id="name"></span>
+		<br>
+		Score: <span id="score"></span>
+		<br>
+	</span>
+
+	<input id="name_input" type="text" class="" ></input>
+	<button id="join_game" class="observing">Join</button>
+	<button id="rename_button" class="playing">Rename</button>
+	<br>
+
+	<button id="leave_game" class="playing">Leave</button>
+
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="module" src="/util.js"></script>
@@ -312,7 +322,7 @@ let game = new Game();
 let robots = [];
 
 let selection = new ActiveSelection(game);
-let canvas = document.getElementById("MainCanvas");
+let canvas = document.getElementById("main_canvas");
 let moveSequence = [];
 let redoStack = [];
 let moveCount = null;
@@ -1688,7 +1698,7 @@ window.onload = function() {
 
 	socket.onopen = function(event) {
 		doTimeSync();
-	}
+	};
 
 	socket.onmessage = function(event) {
 		console.log(`Message = ${event.data}`);
