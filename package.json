@@ -4,7 +4,7 @@
     "async-mutex": "^0.3.2",
     "date-and-time": "^2.3.1",
     "jasmine": "^4.6.0",
-    "ws": "^8.13.0"
+    "ws": "^8.16.0"
   },
   "type": "module",
   "scripts": {

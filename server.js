@@ -123,20 +123,18 @@ function accept(req, res) {
 		return;
 	}
 
-	// can be Connection: keep-alive, Upgrade
-	if (!req.headers.connection.match(/\bupgrade\b/i)) {
-		res.end();
-		return;
-	}
-
-	if (resolvedFile == '/robots.html') {
-		wss.handleUpgrade(req, req.socket, Buffer.alloc(0), (socket) => {
-			robotsGameInstance.onSocketConnect(clientKey, socket);
-		});
-	} else {
-		res.end();
-		return;
-	}
+	res.end();
+	return;
 }
 
-http.createServer(accept).listen(8080);
+let server = http.createServer(accept)
+
+server.on('upgrade', (req, socket, head) => {
+	wss.handleUpgrade(req, socket, head, (socket) => {
+		let clientKey = getClientKey(req);
+		wss.emit('connection', socket, req);
+		robotsGameInstance.onSocketConnect(clientKey, socket);
+	});
+});
+
+server.listen(8080);
