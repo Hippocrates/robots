@@ -83,9 +83,6 @@ export class RobotsGameInstance {
 	}
 	
 	sendAllExcept(message, exceptFor) {
-		if (exceptFor != null) {
-			console.log(`Except for ${exceptFor}`);
-		}
 		for (const [clientKey, client] of this.clients) {
 			console.log(`ClientKey = ${clientKey}`);
 			if (clientKey != exceptFor) {
@@ -444,6 +441,22 @@ export class RobotsGameInstance {
 	clearVotes() {
 		this.game.clearVotes();
 	}
+
+	dropPlayer(playerId) {
+		this.clients.forEach((client, key) => {
+			if (client.playerId == playerId) {
+				client.playerId = null;
+				this.game.removePlayer(playerId);
+			
+				if (this.game.state == State.Solve && this.game.getSolvingPlayer() == playerId) {
+					// TODO: concat these commands with the player leaving command
+					this.advanceSolveState();
+				}
+			
+				this.sendAll(`PLAYER_LEFT ${playerId}`);
+			}
+		})
+	}
 	
 	doCommand(client, command, args) {
 		if (command == 'SYNC_TIME') {
@@ -461,18 +474,7 @@ export class RobotsGameInstance {
 			
 			this.sendAllExcept(playerJoinedCommand, client.key);
 		} else if (command == 'LEAVE_GAME') {
-			if (client.playerId != null) {
-				let playerId = client.playerId;
-				client.playerId = null;
-				this.game.removePlayer(playerId);
-				
-				if (this.game.state == State.Solve && this.game.getSolvingPlayer() == playerId) {
-					// TODO: concat these commands with the player leaving command
-					this.advanceSolveState();
-				}
-				
-				this.sendAll(`PLAYER_LEFT ${playerId}`);
-			}
+			dropPlayer(client.playerId);
 		} else if (command == 'PLAYER_RENAME') {
 			let playerId = parseInt(args[0]);
 			let newName = this.game.renamePlayer(playerId, this.game.makeValidName(args[1]));

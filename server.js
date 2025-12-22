@@ -138,3 +138,56 @@ server.on('upgrade', (req, socket, head) => {
 });
 
 server.listen(8080);
+
+const commands_help = new Map([
+	['HELP', 'HELP [<command_name>]\n\tPrints information about <command_name>, or about all commands if no argument is specified.\n'],
+	['LIST', 'LIST\n\tList all connected clients, and their player info if they are playing.\n'],
+	['KICK', 'KICK <player_id>\n\tRemoves <player_id> from the game. It does not prevent them from re-joining. This is mostly just to avoid having zombie clients in the player list.\n'],
+])
+
+process.stdin.on('data', (chunk) => {
+    const data = chunk.toString().trim();
+	let [command, ...args] = data.split(' ');
+	command = command.toUpperCase();
+	
+	if (command == 'HELP') {
+		let help_commands = ['HELP', 'LIST', 'KICK'];
+		if (args.length > 0) {
+			help_commands = [args[0].toUpperCase()];
+		}
+
+		help_commands.forEach((value) => {
+			let found = commands_help.get(value);
+			if (found === undefined) {
+				process.stdout.write(`Unknown command: ${value}\n`)
+			} else {
+				process.stdout.write(found);
+			}
+		})
+
+	} else if (command == 'LIST') {
+		process.stdout.write('Connected clients:\n');
+		if (robotsGameInstance.clients.size == 0) {
+			process.stdout.write('  *No clients*\n');
+		}
+		robotsGameInstance.clients.forEach((value, key) => {
+			let player = robotsGameInstance.game.getPlayer(value.playerId);
+			let player_info = '<lurking>';
+			if (player !== undefined) {
+				player_info = `${player.name} (${player.id})`;
+			}
+			process.stdout.write(`  ${key}: ${player_info}\n`);
+		})
+	} else if (command == 'KICK') {
+		if (args.length > 0) {
+			let player = robotsGameInstance.game.getPlayer(parseInt(args[0]));
+			if (player !== undefined) {
+				robotsGameInstance.dropPlayer(player.id);
+			} else {
+				process.stdout.write(`Invalid player id: ${player_id}`);
+			}
+		} else {
+			process.stdout.write('KICK <player_id>');
+		}
+	}
+});
